@@ -1,3 +1,5 @@
+![images/main-window.png]()
+
 ### Показать текущую версию
 make version
 
