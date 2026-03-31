@@ -1,4 +1,4 @@
-![images/main-window.png]()
+![](images/main-window.png)
 
 ### Показать текущую версию
 make version
@@ -10,7 +10,7 @@ make info
 make files
 
 ### Проверить пакет на ошибки
-make check
+make checkP
 
 ### Полностью удалить пакет
 make remove
