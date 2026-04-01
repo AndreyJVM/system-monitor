@@ -115,6 +115,56 @@ info:
 		echo "Package exists: No (run 'make build' first)"; \
 	fi
 
+# GitHub Release
+release: build
+	@echo "Creating GitHub release v$(VERSION)..."
+	@# Создаем release notes
+	@sed "s/{VERSION}/$(VERSION)/g" release-notes-template.md | \
+	 sed "s/{REPO_OWNER}/$$(git config --get remote.origin.url | sed -n 's/.*[:/]\([^/]*\)\/\([^.]*\).*/\1/p')/g" | \
+	 sed "s/{REPO_NAME}/$$(git config --get remote.origin.url | sed -n 's/.*[:/]\([^/]*\)\/\([^.]*\).*/\2/p')/g" > release-notes.md
+	@# Добавляем запись из changelog
+	@echo "" >> release-notes.md
+	@echo "## 📝 Changelog" >> release-notes.md
+	@echo "\`\`\`" >> release-notes.md
+	@head -20 debian/changelog >> release-notes.md
+	@echo "\`\`\`" >> release-notes.md
+	@chmod +x create-release.sh
+	@./create-release.sh
+
+# Проверка готовности к релизу
+release-check:
+	@echo "Checking release readiness..."
+	@# Проверяем что нет незакоммиченных изменений
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "$(RED)Error: Uncommitted changes exist$(NC)"; \
+		git status --short; \
+		exit 1; \
+	fi
+	@# Проверяем что версия в VERSION совпадает с git tag
+	@if git tag | grep -q "v$(VERSION)"; then \
+		echo "$(YELLOW)Warning: Tag v$(VERSION) already exists$(NC)"; \
+	fi
+	@echo "$(GREEN)Ready for release$(NC)"
+
+# Показать команды для ручного релиза
+release-help:
+	@echo "To create a GitHub release:"
+	@echo "  1. Update version: make version-patch (or version-minor)"
+	@echo "  2. Update changelog: make update-changelog"
+	@echo "  3. Build package: make build"
+	@echo "  4. Create release: make release"
+	@echo ""
+	@echo "Or use: make release-patch (automates all steps)"
+
+# Автоматический релиз с увеличением patch версии
+release-patch: version-patch update-changelog build release
+
+# Автоматический релиз с увеличением minor версии
+release-minor: version-minor update-changelog build release
+
+# Автоматический релиз с увеличением major версии
+release-major: version-major update-changelog build release
+
 # Показать установленные файлы
 files:
 	@dpkg -L $(PACKAGE_NAME) 2>/dev/null || echo "Package not installed"

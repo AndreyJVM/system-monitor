@@ -1,25 +1,22 @@
+## Installation
+
+### Debian/Ubuntu and derivatives
+
+```bash
+# Download the package
+wget https://github.com/AndreyJVM/system-monitor/releases/download/v{VERSION}/system-monitor_{VERSION}_all.deb
+
+# Install
+sudo dpkg -i system-monitor_{VERSION}_all.deb
+
+# Install dependencies if needed
+sudo apt-get install -f
+```
+---
+
 ![](images/main-window.png)
 
-### Показать текущую версию
-make version
 
-### Показать информацию о пакете
-make info
-
-### Показать установленные файлы
-make files
-
-### Проверить пакет на ошибки
-make checkP
-
-### Полностью удалить пакет
-make remove
-
-### Очистить все собранные пакеты
-make clean-all
-
-### Только сборка без установки
-make build
-
-### Быстрая переустановка (если пакет уже собран)
-make reinstall
+```shell
+make release-patch
+```
